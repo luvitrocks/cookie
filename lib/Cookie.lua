@@ -1,10 +1,13 @@
 local os = require('os')
 local qs = require('querystring')
 local table = require('table')
-local crypto = require('tls/lcrypto')
+local crypto = require('openssl')
 local json = require('json')
 local Object = require('core').Object
 local helpers = require('./helpers')
+-- local openssl = require('openssl')
+
+-- p(openssl.hmac)
 
 local Cookie = Object:extend()
 
@@ -44,7 +47,7 @@ function Cookie:parse (str, options)
   options.decode = options.decode or qs.urldecode
 
   local tbl = {}
-  local cookiePairs = helpers.split(str, '%;%,')
+  local cookiePairs = helpers.split(str, '%; ')
 
   table.foreach(cookiePairs, function (index, pair)
     local eqIndex = helpers.indexOf(pair, '=')
@@ -73,10 +76,21 @@ end
 -- @return {String}
 
 function Cookie:sign (value, secret)
-  if type(value) ~= 'string' then error('cookie required') end
-  if type(secret) ~= 'string' then error('secret required') end
+  if type(value) ~= 'string' then
+    error('cookie required')
+  end
 
-  local signed = value .. '.' .. crypto.hmac.new('sha256', secret):update(value):final():gsub('%=+$', '')
+  if type(secret) ~= 'string' then
+    error('secret required')
+  end
+
+  local hmac = crypto.hmac.new('sha256', secret)
+
+  hmac:update(value)
+
+  local signed = value .. '.' .. hmac:final():gsub('%=+$', '')
+
+  p(signed)
 
   return signed
 end
@@ -87,8 +101,13 @@ end
 -- @return {String}
 
 function Cookie:unsign (value, secret)
-  if type(value) ~= 'string' then error('cookie required') end
-  if type(secret) ~= 'string' then error('secret required') end
+  if type(value) ~= 'string' then
+    error('cookie required')
+  end
+
+  if type(secret) ~= 'string' then
+    error('secret required')
+  end
 
   local str = value:sub(1, helpers.lastIndexOf(value, '%.') - 1)
 
