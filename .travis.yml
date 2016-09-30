@@ -1,0 +1,16 @@
+language: c
+
+before_install:
+  - curl -L https://github.com/luvit/lit/raw/master/get-lit.sh | sh
+  - ./lit make luvit/luvit
+  - ./lit install
+
+script: ./luvit ./test
+
+env:
+  global:
+    - PLATFORM=linux
+  matrix:
+    - LUA=lua5.1
+    - LUA=lua5.2
+    - LUA=luajit
