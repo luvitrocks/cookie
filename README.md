@@ -1,5 +1,7 @@
 # Cookie
 
+[![Build Status](https://travis-ci.org/luvitrocks/luvit-cookie.svg?branch=master)](https://travis-ci.org/luvitrocks/luvit-cookie)
+
 > Basic HTTP cookie parser and serializer for HTTP servers in [Luvit.io](https://luvit.io).
 
 ## Install
