@@ -2,6 +2,12 @@ local test = require('lua-tape').test
 local Cookie = require('../lib/Cookie')
 
 local cookie = Cookie:new()
+local secret = 'tobiiscool'
+
+test('should be ok', function (t)
+  t:ok(cookie, 'has instance')
+  t:done()
+end)
 
 test('shoud have valid tostring value', function (t)
   local r = tostring(cookie)
@@ -30,7 +36,6 @@ test('shoud serialize cookie', function (t)
 end)
 
 test('shoud sign and unsign cookie', function (t)
-  local secret = 'tobiiscool'
   local signed = cookie:sign('hello', secret)
 
   t:equals(type(signed), 'string', 'is string')
@@ -44,3 +49,18 @@ test('shoud sign and unsign cookie', function (t)
   t:done()
 end)
 
+test('shoud parse json cookie', function (t)
+  local r = cookie:parseJSONCookie('j:{"foo":"bar"}')
+
+  t:equals(type(r), 'table', 'is table')
+  t:equals(r.foo, 'bar', 'has proper value')
+  t:done()
+end)
+
+test('shoud parse signed cookie', function (t)
+  local r = cookie:parseSignedCookie('s:hello.0c60d4906948902ccfcfe0b4074eb814d8077448e8c7b721f2d3811ac959e502', secret)
+
+  t:equals(type(r), 'string', 'is string')
+  t:equals(r, 'hello', 'has proper value')
+  t:done()
+end)

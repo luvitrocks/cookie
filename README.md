@@ -92,7 +92,7 @@ Sign the given `value` with `secret`.
 
 ```lua
 local signed = cookie:sign('hello', 'tobiiscool')
--- 'hello.DGDUkGlIkCzPz+C0B064FNgHdEjox7ch8tOBGslZ5QI'
+-- 'hello.0c60d4906948902ccfcfe0b4074eb814d8077448e8c7b721f2d3811ac959e502'
 ```
 
 ### cookie:unsign(value, secret)
@@ -107,6 +107,33 @@ cookie:unsign(signed, 'tobiiscool')
 
 cookie:unsign(signed, 'luna')
 -- false
+```
+
+### cookie:parseJSONCookie(value)
+
+Parse a cookie value as a JSON cookie. This will return the parsed JSON value if it was a JSON cookie.
+
+### cookie:parseJSONCookies(table)
+
+Given a table, this will iterate over the keys and call `parseJSONCookie` on each value. This will return the same table passed in.
+
+```lua
+local cookie = cookie:parseJSONCookie('j:{"foo":"bar"}')
+-- { foo = 'bar' }
+```
+
+### cookie:parseSignedCookie(value, secret)
+
+Parse a cookie value as a signed cookie. This will return the parsed unsigned value if it was a signed cookie and the signature was valid.
+
+### cookie:parseSignedCookies(table, secret)
+
+Given a table, this will iterate over the keys and check if any value is a signed cookie. If it is a signed cookie and the signature is valid, the key will be deleted from the table and added to the new table that is returned.
+
+
+```lua
+local cookie = cookie:parseSignedCookie('s:hello.0c60d4906948902ccfcfe0b4074eb814d8077448e8c7b721f2d3811ac959e502')
+-- hello
 ```
 
 ## Tests
